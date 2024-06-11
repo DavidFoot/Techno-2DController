@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask m_groundLayer;
     [SerializeField] bool isGrounded;
     [SerializeField] private float m_jumpMaxCharge;
-
+    public STATE currentState;
     Animator m_animator;
     private SpriteRenderer m_spriteRender;
     private Rigidbody2D m_body;
@@ -22,7 +22,14 @@ public class PlayerController : MonoBehaviour
     private bool isJumping;
     private float jumpTimer;
     
-
+    public enum STATE
+    {
+        idle,
+        jumping,
+        falling,
+        ground,
+        running
+    }
     // Start is called before the first frame update
     private void Awake()
     {
@@ -32,14 +39,34 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
-        
+        currentState = STATE.idle;
     }
 
     // Update is called once per frame
     void Update()
     {
-        isGrounded = Physics2D.OverlapCircle(m_overlapCirclePosition.position,m_overlapRadius,m_groundLayer);
         m_body.gravityScale = m_gravityScale;
+
+        isGrounded = Physics2D.OverlapCircle(m_overlapCirclePosition.position, m_overlapRadius, m_groundLayer);
+
+        switch (currentState)
+        {
+            case STATE.idle: 
+                
+
+                
+                break;
+            case STATE.jumping: break;
+            case STATE.falling: break;
+            case STATE.ground: break;
+            case STATE.running: break;
+        }
+
+
+
+
+        
+        
         // Comprends pas le previous frame.. 
         if (isGrounded && m_wasGroundedOnPreviousFrame == false)
         {
