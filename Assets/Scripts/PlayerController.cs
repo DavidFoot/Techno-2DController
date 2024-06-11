@@ -6,15 +6,22 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] float m_velocity = 1;
+    [SerializeField] float m_jumpForce = 8;
+    [SerializeField] float m_gravityScale = 4f;
+    [SerializeField] float m_gravityScaleFalling = 8f;
     [SerializeField] Transform m_overlapCirclePosition;
     [SerializeField] float m_overlapRadius;
     [SerializeField] LayerMask m_groundLayer;
     [SerializeField] bool isGrounded;
+    [SerializeField] private float m_jumpMaxCharge;
 
     Animator m_animator;
     private SpriteRenderer m_spriteRender;
     private Rigidbody2D m_body;
     private bool m_wasGroundedOnPreviousFrame;
+    private bool isJumping;
+    private float jumpTimer;
+    
 
     // Start is called before the first frame update
     private void Awake()
@@ -32,16 +39,42 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         isGrounded = Physics2D.OverlapCircle(m_overlapCirclePosition.position,m_overlapRadius,m_groundLayer);
-       
-        if (isGrounded )
+        m_body.gravityScale = m_gravityScale;
+        // Comprends pas le previous frame.. 
+        if (isGrounded && m_wasGroundedOnPreviousFrame == false)
         {
             m_animator.SetTrigger("onGroundTrigger");
         }
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (m_body.velocity.y < 0)
         {
-            m_animator.SetTrigger("JumpTrigger");
-            m_body.AddForce(Vector2.up * 8f, ForceMode2D.Impulse);
+            m_body.gravityScale = m_gravityScaleFalling;
         }
+
+
+        // Classic Jump 
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    m_animator.SetTrigger("JumpTrigger");
+        //    m_body.AddForce(Vector2.up * m_jumpForce, ForceMode2D.Impulse);
+        //}
+
+
+        // Variable Jump based on timer 
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
+            isJumping = true;
+            jumpTimer = 0f;
+        }
+        if (isJumping)
+        {
+            m_body.velocity = new Vector2(m_body.velocity.x,m_jumpForce);
+            jumpTimer += Time.deltaTime;
+        }
+        if (Input.GetKeyUp(KeyCode.Space) || jumpTimer >= m_jumpMaxCharge)
+        {
+            isJumping = false;
+        }
+
+
         float InputX = Input.GetAxis("Horizontal");
         bool isMoving = Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1f;
 
