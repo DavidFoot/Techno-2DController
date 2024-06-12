@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask m_groundLayer;
     [SerializeField] bool isGrounded;
     [SerializeField] private float m_jumpMaxCharge;
+    [SerializeField] AnimatorOverrideController m_overrideController;
     public STATE currentState;
     Animator m_animator;
     private SpriteRenderer m_spriteRender;
@@ -123,10 +124,8 @@ public class PlayerController : MonoBehaviour
             isBufferingJump = true;
         }
         timerLastSpacePressed += Time.deltaTime;
-        Debug.Log(isBufferingJump);
         if (isGrounded && timerLastSpacePressed <= m_bufferJumpTime && isBufferingJump)
         {
-            Debug.Log("BufferedJump");
             m_body.velocity = new Vector2(m_body.velocity.x, m_jumpForce);
             //jumpTimer = 0f;
             isJumping = true;
@@ -148,5 +147,17 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(m_body.velocity);
         m_wasGroundedOnPreviousFrame = isGrounded;
         m_animator.SetFloat("VerticalVelocity", m_body.velocity.y);
+    }
+
+    private void OnCollisionEnter2D(Collision2D _collision)
+    {
+        if (_collision.gameObject.TryGetComponent(out ICollectable collectable))
+        {
+            collectable.Collect(this);
+        }
+    }
+    public void getSword()
+    {
+        m_animator.runtimeAnimatorController = m_overrideController;
     }
 }
