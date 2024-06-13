@@ -14,7 +14,9 @@ namespace COM.David.TurnManager
         [SerializeField] List<CharacterBase> m_playerTeam;
         [SerializeField] List<CharacterBase> m_cpuTeam;
         [SerializeField] public GameObject m_selectionPointer;
+        [SerializeField] public GameObject m_selectionTarget;
         public static CharacterBase m_currentSelectedCharacter;
+        public static CharacterBase m_currentSelectedTarget;
         enum STATE
         {
             PLAYER,
@@ -26,6 +28,8 @@ namespace COM.David.TurnManager
         STATE currentState;
         private bool playerIsDead;
         private bool cpuIsDead;
+        
+
         private void Awake()
         {
             ConnectWithCharacterBase(m_playerTeam);
@@ -76,10 +80,16 @@ namespace COM.David.TurnManager
         public void Select(CharacterBase _character)
         {
             m_selectionPointer.SetActive(true);
-            m_selectionPointer.transform.position = (Vector2) _character.transform.position + Vector2.up*1.5f;
-
+            m_selectionPointer.transform.position = (Vector2) _character.transform.position + Vector2.up*1f;
             if (m_currentSelectedCharacter != null) m_currentSelectedCharacter.Deselect();
             m_currentSelectedCharacter = _character;
+        }
+        public void SetTarget(CharacterBase _character)
+        {
+            m_selectionTarget.SetActive(true);
+            m_selectionTarget.transform.position = (Vector2)_character.transform.position + Vector2.up;
+            if (m_currentSelectedTarget != null) m_currentSelectedTarget.Deselect();
+            m_currentSelectedTarget = _character;
         }
         public void NextTurn()
         {

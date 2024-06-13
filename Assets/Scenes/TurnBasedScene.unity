@@ -221,6 +221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterHealth: 5
+  m_type: 1
 --- !u!61 &101958732
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -825,6 +826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterHealth: 5
+  m_type: 1
 --- !u!61 &547200950
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1037,6 +1039,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterHealth: 20
+  m_type: 0
 --- !u!61 &703245111
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1269,6 +1272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterHealth: 20
+  m_type: 0
 --- !u!61 &826481606
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1547,6 +1551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterHealth: 5
+  m_type: 1
 --- !u!61 &1018967357
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1825,6 +1830,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_characterHealth: 20
+  m_type: 0
 --- !u!61 &1350297644
 BoxCollider2D:
   m_ObjectHideFlags: 0
