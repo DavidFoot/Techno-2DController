@@ -1,5 +1,6 @@
 using COM.David.TurnCharacter;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,9 +16,12 @@ namespace COM.David.TurnManager
         [SerializeField] List<CharacterBase> m_cpuTeam;
         [SerializeField] public GameObject m_selectionPointer;
         [SerializeField] public GameObject m_selectionTarget;
+        [SerializeField] public GameObject m_attackButton;
+
         public static CharacterBase m_currentSelectedCharacter;
         public static CharacterBase m_currentSelectedTarget;
-        enum STATE
+
+        public enum STATES
         {
             PLAYER,
             CPU
@@ -25,7 +29,7 @@ namespace COM.David.TurnManager
 
         private TextMeshProUGUI m_textPlayer;
         private TextMeshProUGUI m_textGameResult;
-        STATE currentState;
+        STATES currentState;
         private bool playerIsDead;
         private bool cpuIsDead;
         
@@ -47,8 +51,9 @@ namespace COM.David.TurnManager
         {
             m_textPlayer = m_displayCurrentPlayer.GetComponent<TextMeshProUGUI>();
             m_textGameResult = m_displayResultat.GetComponent<TextMeshProUGUI>();
-            currentState = STATE.PLAYER;
+            currentState = STATES.PLAYER;
             DisplayCurrentPlayer();
+            DeselectAll();
         }
 
         // Update is called once per frame
@@ -66,8 +71,9 @@ namespace COM.David.TurnManager
                 m_textGameResult.gameObject.SetActive(true);
                 m_textGameResult.text = "Equipe CPU est morte";
             }
-        }
+            if(m_currentSelectedCharacter && m_currentSelectedTarget) m_attackButton.SetActive(true);
 
+        }
         public bool IsDeadTeamFor(List<CharacterBase> _team)
         {
             // a Remplacer par un for pour question de performance
@@ -91,20 +97,60 @@ namespace COM.David.TurnManager
             if (m_currentSelectedTarget != null) m_currentSelectedTarget.Deselect();
             m_currentSelectedTarget = _character;
         }
+
+        public void selectionV2(CharacterBase _character)
+        {
+            switch( currentState)
+            {
+                case STATES.PLAYER :
+                    if ((STATES)_character.m_type == STATES.PLAYER) { Select(_character); } else { SetTarget(_character); }
+                    break;
+                case STATES.CPU :
+                    if ((STATES)_character.m_type == STATES.PLAYER) { SetTarget(_character); } else { Select(_character); }
+                    break;
+            }
+        }
+        public void Attack()
+        {
+            m_currentSelectedTarget.GetHit(m_currentSelectedCharacter);
+            m_currentSelectedTarget.RefreshHealthBar();
+            NextTurn();
+        }
         public void NextTurn()
         {
-            currentState = (currentState == STATE.CPU) ? STATE.PLAYER : STATE.CPU;
-            Debug.Log(currentState);
+            DeselectAll();
+            currentState = (currentState == STATES.CPU) ? STATES.PLAYER : STATES.CPU;
+            if (currentState == STATES.CPU) StartCoroutine("SimulateCPUTurn");
             DisplayCurrentPlayer();
+        }
+
+        IEnumerator SimulateCPUTurn()
+        {
+            int _source = UnityEngine.Random.Range(0, m_cpuTeam.Count);
+            int _target = UnityEngine.Random.Range(0, m_playerTeam.Count);
+            selectionV2(m_cpuTeam[_source]);          
+            yield return new WaitForSeconds(2f);
+            selectionV2(m_playerTeam[_target]);
+            yield return new WaitForSeconds(2f);
+            Attack();
+        }
+
+        private void DeselectAll()
+        {
+            m_currentSelectedTarget = null;
+            m_currentSelectedCharacter = null;
+            m_selectionTarget.SetActive(false);
+            m_selectionPointer.SetActive(false);
+            m_attackButton.SetActive(false);
         }
         public void DisplayCurrentPlayer()
         {
             switch (currentState)
             {
-                case STATE.PLAYER:
+                case STATES.PLAYER:
                     m_textPlayer.text = "Player";
                     break;
-                case STATE.CPU:
+                case STATES.CPU:
                     m_textPlayer.text = "CPU";
                     break;
             }

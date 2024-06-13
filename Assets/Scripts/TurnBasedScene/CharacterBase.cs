@@ -11,7 +11,7 @@ namespace COM.David.TurnCharacter
         [SerializeField] public STATE m_type;
         [SerializeField] CharacterScriptableObject m_characterStats;
         private TurnBasedController m_turnBasedController;
-        private int m_currentHealth;
+        public float m_currentHealth;
         private TextMeshProUGUI m_textHealthPoint;
         public enum STATE
         {
@@ -22,24 +22,31 @@ namespace COM.David.TurnCharacter
         {
             m_currentHealth = m_characterStats.m_maxHealthPoints;
             m_textHealthPoint = GetComponentInChildren<TextMeshProUGUI>();
-            m_textHealthPoint.text = m_currentHealth  + "/" + m_characterStats.m_maxHealthPoints;
-            m_textHealthPoint.transform.position = Camera.main.WorldToScreenPoint(transform.position + (Vector3.down)*0.75f);
+            m_textHealthPoint.transform.position = Camera.main.WorldToScreenPoint(transform.position + (Vector3.down) * 0.75f);
+            RefreshHealthBar();
         }
+
+        public void RefreshHealthBar()
+        {
+                       
+            m_textHealthPoint.text = m_currentHealth + "/" + m_characterStats.m_maxHealthPoints;         
+        }
+
         // Start is called before the first frame update
-        public int GetHealthPoint() {  return m_characterStats.m_maxHealthPoints; }
+        public float GetHealthPoint() {  return m_currentHealth; }
+        
+        public void GetHit(CharacterBase _attacker)
+        {
+            m_currentHealth = Mathf.Clamp(m_currentHealth - _attacker.GetAttackPoint(), 0,float.MaxValue);
+        }
+        
         private void OnMouseDown()
         {
-            switch (m_type)
-            {
-                case STATE.PLAYER:
-                    m_turnBasedController.Select(this);
-                    break; 
-                
-                case STATE.CPU:
-                    m_turnBasedController.SetTarget(this);
-                    break;
-            }
-            
+            m_turnBasedController.selectionV2(this);
+        }
+        public float  GetAttackPoint()
+        {
+            return m_characterStats.m_damagePoints;
         }
         public void Deselect() { }
 
