@@ -1,4 +1,6 @@
+using COM.David.scriptableObject;
 using COM.David.TurnManager;
+using TMPro;
 using UnityEngine;
 
 namespace COM.David.TurnCharacter
@@ -6,23 +8,27 @@ namespace COM.David.TurnCharacter
     public class CharacterBase : MonoBehaviour
     {
         
-        [SerializeField] public int m_characterHealth;
         [SerializeField] public STATE m_type;
+        [SerializeField] CharacterScriptableObject m_characterStats;
         private TurnBasedController m_turnBasedController;
-        private bool isSelected;
-
+        private int m_currentHealth;
+        private TextMeshProUGUI m_textHealthPoint;
         public enum STATE
         {
             PLAYER,
             CPU
         }
-
+        private void Awake()
+        {
+            m_currentHealth = m_characterStats.m_maxHealthPoints;
+            m_textHealthPoint = GetComponentInChildren<TextMeshProUGUI>();
+            m_textHealthPoint.text = m_currentHealth  + "/" + m_characterStats.m_maxHealthPoints;
+            m_textHealthPoint.transform.position = Camera.main.WorldToScreenPoint(transform.position + (Vector3.down)*0.75f);
+        }
         // Start is called before the first frame update
-        public int GetHealthPoint() {  return m_characterHealth; }
+        public int GetHealthPoint() {  return m_characterStats.m_maxHealthPoints; }
         private void OnMouseDown()
         {
-            isSelected = true;
-
             switch (m_type)
             {
                 case STATE.PLAYER:
@@ -42,7 +48,6 @@ namespace COM.David.TurnCharacter
         {
             m_turnBasedController = _controller;
         }
-        public bool IsSelected() { return isSelected; }
 
 
     }
